@@ -1,0 +1,177 @@
+#include "DetectorConstruction.hh"
+#include "G4RunManager.hh"
+#include "G4NistManager.hh"
+#include "G4Box.hh"
+#include "G4Cons.hh"
+#include "G4Tubs.hh"
+#include "G4Orb.hh"
+#include "G4Sphere.hh"
+#include "G4Trd.hh"
+#include "G4LogicalVolume.hh"
+#include "G4PVPlacement.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4VPVParameterisation.hh"
+#include "G4Ellipsoid.hh"
+#include "G4SubtractionSolid.hh"
+#include "G4RotationMatrix.hh"
+#include "G4Transform3D.hh"
+#include "G4PhysicalConstants.hh"//物理常数,真空用
+#include "G4VisAttributes.hh"
+//using std::ofstream;
+//using std::string;
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+// Get nist material manager
+  G4NistManager* nistman=G4NistManager::Instance();
+//parameters-------------------------------------------------------------
+  //world
+  G4double world_size = 10*cm;
+  G4Material* world_mat = new G4Material("Galactic", 1., 1.01*g/mole,universe_mean_density,kStateGas, 2.73*kelvin, 3.e-18*pascal);
+   //窗的z位置作为窗，准直，靶的基准位
+  G4double jizhun = -4.3*cm;
+  //靶和窗的z距离
+  G4double ba_win = 0.5*cm;
+  //win
+  G4double win_x = 2.*mm;
+  G4double win_y = 2.*mm;
+  G4double win_z = 0.065*mm;
+  G4Material* win_mat = nistman->FindOrBuildMaterial("G4_Be");
+  G4ThreeVector pos_win = G4ThreeVector(0., 0., jizhun);
+  //ba
+  G4double ba_x =  5.*mm;
+  G4double ba_y =  5.*mm;
+  G4double ba_z =  0.0004*mm;
+  G4Material* ba_mat = nistman->FindOrBuildMaterial("G4_W");
+  G4ThreeVector pos_ba = G4ThreeVector(0., 0., jizhun-ba_win-win_z);
+  //
+  //zhun
+  G4double zhun_pRMin =1.*mm;//内径
+  G4double zhun_pRMax =10.*mm;//外径
+  G4double zhun_pDz   =1.*mm;//厚
+  G4Material* zhun_mat = nistman->FindOrBuildMaterial("G4_Pb");
+  G4ThreeVector pos_zhun = G4ThreeVector(0., 0., (jizhun+zhun_pDz+win_z));//窗的位置紧挨在准直孔上，靶孔之间
+  //j
+  G4Material* j1_mat = nistman->FindOrBuildMaterial("G4_Ni");
+  G4ThreeVector pos_j1 = G4ThreeVector(0., 0., 0.);
+  G4double j11_pxSemiAxis=0.6*cm;
+  G4double j11_pySemiAxis=0.6*cm;
+  G4double j11_pzSemiAxis=5.*cm;
+  G4double j11_pzBottomCut=-4.*cm;
+  G4double j11_pzTopCut=4.*cm;
+  //j2
+  G4double j12_pxSemiAxis=0.5*cm;
+  G4double j12_pySemiAxis=0.5*cm;
+  G4double j12_pzSemiAxis=5.*cm;
+  G4double j12_pzBottomCut=0.*cm;
+  G4double j12_pzTopCut=0.*cm;
+  //zhun_pSPhi =;
+  //zhun_pDPhi =;
+  const G4int NUM = 72;
+
+  G4double PPCKOV[NUM] =
+      { 0.3410E-9*GeV, 0.3486E-9*GeV, 0.3535E-9*GeV, 0.3623E-9*GeV,
+        0.3754E-9*GeV, 0.3795E-9*GeV, 0.3822E-9*GeV, 0.5087E-9*GeV,
+        0.5332E-9*GeV, 0.5760E-9*GeV, 0.6024E-9*GeV, 0.6293E-9*GeV,
+        0.6838E-9*GeV, 0.7254E-9*GeV, 0.7322E-9*GeV, 0.7376E-9*GeV,
+        0.7466E-9*GeV, 0.8106E-9*GeV, 0.8437E-9*GeV, 0.8887E-9*GeV,
+        0.9102E-9*GeV, 1.0985E-9*GeV, 1.1449E-9*GeV, 1.2228E-9*GeV,
+        1.3863E-9*GeV, 1.4550E-9*GeV, 1.7549E-9*GeV, 1.8566E-9*GeV,
+        1.8892E-9*GeV, 1.9257E-9*GeV, 2.1041E-9*GeV, 2.1102E-9*GeV,
+        2.1489E-9*GeV, 2.2705E-9*GeV, 2.4379E-9*GeV, 2.5504E-9*GeV,
+        2.6503E-9*GeV, 2.8848E-9*GeV, 3.0640E-9*GeV, 3.3967E-9*GeV,
+        3.4340E-9*GeV, 3.5770E-9*GeV, 3.6427E-9*GeV, 3.7105E-9*GeV,
+        3.7542E-9*GeV, 4.1034E-9*GeV, 4.1784E-9*GeV, 4.2848E-9*GeV,
+        4.4226E-9*GeV, 4.5040E-9*GeV, 4.5940E-9*GeV, 4.6751E-9*GeV,
+        4.9939E-9*GeV, 5.1674E-9*GeV, 5.2131E-9*GeV, 5.3858E-9*GeV,
+        5.4680E-9*GeV, 5.7819E-9*GeV, 5.7976E-9*GeV, 6.0000E-9*GeV,
+        6.2500E-9*GeV, 6.5000E-9*GeV, 6.7500E-9*GeV, 7.0000E-9*GeV,
+        7.0000E-9*GeV, 7.4000E-9*GeV, 7.6000E-9*GeV, 7.8000E-9*GeV,
+        8.0000E-9*GeV, 8.1000E-9*GeV, 8.2000E-9*GeV, 8.3000E-9*GeV };
+
+  G4double RefractiveIndex[NUM]=
+      { 1.40000, 1.40418, 1.40568, 1.40819, 1.41155, 1.41253,
+        1.41314, 1.43095, 1.43292, 1.43576, 1.43722, 1.43851,
+        1.44069, 1.44205, 1.44226, 1.44241, 1.44267, 1.44427,
+        1.44497, 1.44584, 1.44621, 1.44888, 1.44941, 1.45025,
+        1.45185, 1.45248, 1.45515, 1.45608, 1.45637, 1.45671,
+        1.45841, 1.45847, 1.45877, 1.45885, 1.46008, 1.46187,
+        1.46313, 1.46429, 1.46669, 1.46961, 1.47453, 1.47746,
+        1.47858, 1.47976, 1.48053, 1.48719, 1.48873, 1.49099,
+        1.49404, 1.49592, 1.49805, 1.50004, 1.50841, 1.51338,
+        1.51474, 1.52009, 1.52276, 1.53371, 1.53429, 1.54300,
+        1.55400, 1.56700, 1.58200, 1.60000, 1.61600, 1.63300,
+        1.65300, 1.67600, 1.70200, 1.71600, 1.73000, 1.74700 };
+
+  G4double reflectivity[NUM] = {0.3, 0.5};
+
+  //================================================================================================================
+
+
+DetectorConstruction::DetectorConstruction()
+:G4VUserDetectorConstruction()
+{}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+DetectorConstruction::~DetectorConstruction()
+{}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+G4VPhysicalVolume* DetectorConstruction::Construct()
+{  
+  // Option to switch on/off checking of volumes overlaps
+  //
+  //G4bool checkOverlaps = true;
+  //     
+  // World
+  //
+  G4Box* solidworld = new G4Box("world",world_size, world_size,world_size); 
+  G4LogicalVolume* logicworld = new G4LogicalVolume(solidworld,world_mat,"world");
+ G4VPhysicalVolume* physiworld =new G4PVPlacement(0,G4ThreeVector(),logicworld,"world",0,false,0);
+  //     
+  // 靶
+  //  G4VPhysicalVolume* physiba =
+  G4Box* solidba = new G4Box("ba",ba_x,ba_y,ba_z);
+  G4LogicalVolume* logicba = new G4LogicalVolume(solidba,ba_mat,"ba");
+  G4RotationMatrix* ba_rotm  = new  G4RotationMatrix();
+          ba_rotm->rotateX(135*degree);
+   new G4PVPlacement(ba_rotm,pos_ba,logicba,"ba",logicworld,false,0);
+   G4VisAttributes * ba_VisAtt = new G4VisAttributes(G4Colour(1.,0.,0.));
+    //ba_VisAtt->SetForceWireframe(true);
+    logicba->SetVisAttributes(ba_VisAtt);
+  //
+  // win
+  //    G4VPhysicalVolume* physiwin =
+  G4Box* solidwin = new G4Box("win",win_x,win_y,win_z);
+  G4LogicalVolume* logicwin = new G4LogicalVolume(solidwin,win_mat,"win");
+ new G4PVPlacement(0,pos_win,logicwin,"win",logicworld,false,0);
+
+ // Instantiation of a set of visualization attributes with cyan colour
+ G4VisAttributes * win_VisAtt = new G4VisAttributes(G4Colour(0.,1.,0.));
+ // Set the forced wireframe style
+ //win_VisAtt->SetForceWireframe(true);
+ // Assignment of the visualization attributes to the logical volume
+ logicwin->SetVisAttributes(win_VisAtt);
+  //
+  //zhun
+  //    G4VPhysicalVolume* physizhun =
+    G4Tubs* solidzhun = new G4Tubs("zhun",zhun_pRMin,zhun_pRMax,zhun_pDz,0.,360*degree);
+    G4LogicalVolume* logiczhun = new G4LogicalVolume(solidzhun,zhun_mat,"zhun");
+    new G4PVPlacement(0,pos_zhun,logiczhun,"zhun",logicworld,false,0);
+ //
+ //j
+ //j1
+ //  G4VPhysicalVolume* physij1 =
+  G4Ellipsoid* solidj11 = new G4Ellipsoid("j11",j11_pxSemiAxis,j11_pySemiAxis,j11_pzSemiAxis,j11_pzBottomCut,j11_pzTopCut);
+  G4Ellipsoid* solidj12 = new G4Ellipsoid("j12",j12_pxSemiAxis,j12_pySemiAxis,j12_pzSemiAxis,j12_pzBottomCut,j12_pzTopCut);
+  G4SubtractionSolid* solidj1 = new G4SubtractionSolid("j1", solidj11, solidj12);
+  G4LogicalVolume* logicj1 = new G4LogicalVolume(solidj1,j1_mat,"j1");
+  new G4PVPlacement(0,pos_j1,logicj1,"j1",logicworld,false,0);
+  G4VisAttributes * j1_VisAtt = new G4VisAttributes(G4Colour(0.,0.,1.));
+  //ba_VisAtt->SetForceWireframe(true);
+  logicj1->SetVisAttributes(j1_VisAtt);
+
+
+return physiworld;
+}

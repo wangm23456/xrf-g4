@@ -1,0 +1,37 @@
+# Set some default verbose
+/control/verbose 2
+/control/saveHistory
+/run/verbose 2
+#
+# Change the default number of threads (in multi-threaded mode)
+/run/numberOfThreads 28
+#
+# activating livermore/empenelope processes
+/phys/addPhysics emstandard_opt4
+/phys/addPhysics emlivermore
+
+# Setting production edges
+/cuts/setLowEdge 300 eV
+
+#
+#Setting fluorescence ON  and Auger ON
+/process/em/fluo true
+/process/em/auger true
+
+/process/em/pixe true
+/process/em/deexcitationIgnoreCut true
+#Selecting Reis model for PIXE. Analytical PIXE will be used outsie 01-10 MeV energy Range
+#/process/em/pixeXSmodel ecpssr_interpolated
+
+#setting cuts
+/phys/setGCut  1 nm
+/phys/setECut  1 nm
+/run/setCut  0.01 mm
+
+# Initialize kernel
+/run/initialize
+
+#/process/em/augerCascade true
+
+#/control/execute vis.mac
+/control/execute gps-2.m
