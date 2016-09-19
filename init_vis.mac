@@ -33,5 +33,5 @@
 
 #/process/em/augerCascade true
 
-#/control/execute vis.mac
-/control/execute gps-2.m
+/control/execute gps.m
+/control/execute vis.mac

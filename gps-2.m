@@ -67,5 +67,5 @@
 /gps/hist/inter Lin
 
 #运行数
-#/run/printProgress 100
-/run/beamOn 50000000
+/run/printProgress 100
+#/run/beamOn 50000000
