@@ -24,7 +24,7 @@ int main(int argc,char** argv)
   //
   G4UIExecutive* ui = 0;
   if ( argc == 1 ) {
-    ui = new G4UIExecutive(argc, argv,"tcsh");
+    ui = new G4UIExecutive(argc, argv,"xm");
   }
 
   // Choose the Random engine

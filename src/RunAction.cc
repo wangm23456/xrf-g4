@@ -10,6 +10,8 @@
 #include "G4SystemOfUnits.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+using std::ofstream;
+using std::string;
 
 RunAction::RunAction()
 : G4UserRunAction()
@@ -42,7 +44,30 @@ G4Run* RunAction::GenerateRun()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void RunAction::BeginOfRunAction(const G4Run*)
-{ 
+{
+  ofstream outfile1("./data/data1.csv");
+ // ofstream outfile2("./data/data2.txt");
+ // ofstream outfile11("./data/data3.txt");
+
+  outfile1 << "name" << " "
+           << "energy" << " "
+           << "px" << " "
+           << "py" << " "
+           << "pz" << " "
+           << "dx" << " "
+          << "dy" << " "
+          << "dz" << " "
+           << "id" << " "
+          << "pid" << " "
+          << "eid" << " "
+ //          << "material" << " "
+          << "pox" << " "
+          << "poy" << " "
+          << "poz" << " "
+          //      << "proname"
+           << G4endl;
+ // outfile2 << Position << G4endl;
+ // outfile3 << Position << G4endl;
   //inform the runManager to save random number seed
   G4RunManager::GetRunManager()->SetRandomNumberStore(false);
 }

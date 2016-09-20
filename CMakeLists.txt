@@ -46,6 +46,10 @@ target_link_libraries(xrf ${Geant4_LIBRARIES})
 set(XRF_SCRIPTS
   init_vis.mac
   vis.mac
+  gps-2.m
+  gps.m
+  ./spec/energy.dat
+
   )
 
 foreach(_script ${XRF_SCRIPTS})
