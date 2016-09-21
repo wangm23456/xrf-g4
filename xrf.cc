@@ -16,15 +16,39 @@
 #include "G4UIExecutive.hh"
 
 //#include "QBBC.hh"
+using std::ofstream;
+using std::string;
+
+ofstream outfile1("./data/data1.csv");
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 int main(int argc,char** argv)
 {
+  outfile1 << "name" << ","
+           << "energy" << ","
+           << "px" << ","
+           << "py" << ","
+           << "pz" << ","
+           << "dx" << ","
+           << "dy" << ","
+           << "dz" << ","
+           << "id" << ","
+           << "pid" << ","
+           << "eid" << ","
+//          << "material" << ","
+           << "pox" << ","
+           << "poy" << ","
+           << "poz" << " "
+//      << "proname"
+           << G4endl;
+  //outfile1.close();
+
   // Detect interactive mode (if no arguments) and define UI session
   //
   G4UIExecutive* ui = 0;
   if ( argc == 1 ) {
-    ui = new G4UIExecutive(argc, argv,"xm");
+    ui = new G4UIExecutive(argc, argv,"tcsh");
   }
 
   // Choose the Random engine
@@ -68,9 +92,9 @@ int main(int argc,char** argv)
     // batch mode
     G4String command = "/control/execute ";
     G4String fileName = argv[1];
-    UImanager->ApplyCommand(command+fileName);
+    UImanager->ApplyCommand(command + fileName);
   }
-  else { 
+  else {
     // interactive mode
     UImanager->ApplyCommand("/control/execute init_vis.mac");
     ui->SessionStart();

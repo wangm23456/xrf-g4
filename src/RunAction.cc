@@ -1,17 +1,15 @@
 #include "RunAction.hh"
-#include "PrimaryGeneratorAction.hh"
-#include "DetectorConstruction.hh"
 #include "Run.hh"
-
+#include "fstream"
+#include "EventAction.hh"
 #include "G4RunManager.hh"
-#include "G4LogicalVolumeStore.hh"
-#include "G4LogicalVolume.hh"
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
+#include "Analysis.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-using std::ofstream;
-using std::string;
+
+
 
 RunAction::RunAction()
 : G4UserRunAction()
@@ -27,12 +25,30 @@ RunAction::RunAction()
   new G4UnitDefinition("microgray", "microGy" , "Dose", microgray);
   new G4UnitDefinition("nanogray" , "nanoGy"  , "Dose", nanogray);
   new G4UnitDefinition("picogray" , "picoGy"  , "Dose", picogray);        
+
+  G4RunManager::GetRunManager()->SetPrintProgress(1);
+  G4AnalysisManager* man = G4AnalysisManager::Instance();
+  G4cout << "Using " << man->GetType() << G4endl;
+
+  man->SetVerboseLevel(1);
+  man->SetFileName("data");
+
+
+  man->CreateNtuple("data","1");
+  man->CreateNtupleDColumn("name");
+  man->CreateNtupleDColumn("px");
+  man->CreateNtupleDColumn("py");
+  man->CreateNtupleDColumn("pz");
+  man->FinishNtuple();
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 RunAction::~RunAction()
-{}
+{
+  delete G4AnalysisManager::Instance();
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -45,29 +61,8 @@ G4Run* RunAction::GenerateRun()
 
 void RunAction::BeginOfRunAction(const G4Run*)
 {
-  ofstream outfile1("./data/data1.csv");
- // ofstream outfile2("./data/data2.txt");
- // ofstream outfile11("./data/data3.txt");
-
-  outfile1 << "name" << " "
-           << "energy" << " "
-           << "px" << " "
-           << "py" << " "
-           << "pz" << " "
-           << "dx" << " "
-          << "dy" << " "
-          << "dz" << " "
-           << "id" << " "
-          << "pid" << " "
-          << "eid" << " "
- //          << "material" << " "
-          << "pox" << " "
-          << "poy" << " "
-          << "poz" << " "
-          //      << "proname"
-           << G4endl;
- // outfile2 << Position << G4endl;
- // outfile3 << Position << G4endl;
+  G4AnalysisManager* man = G4AnalysisManager::Instance();
+  man->OpenFile();
   //inform the runManager to save random number seed
   G4RunManager::GetRunManager()->SetRandomNumberStore(false);
 }
@@ -75,4 +70,8 @@ void RunAction::BeginOfRunAction(const G4Run*)
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void RunAction::EndOfRunAction(const G4Run*)
-{}
+{
+  G4AnalysisManager* man = G4AnalysisManager::Instance();
+  man->Write();
+  man->CloseFile();
+}

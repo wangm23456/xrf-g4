@@ -35,7 +35,7 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #
-add_executable(xrf xrf.cc ${sources} ${headers})
+add_executable(xrf xrf.cc ${sources} ${headers} src/data.cpp include/xrfAnalysis.hh include/Analysis.hh)
 target_link_libraries(xrf ${Geant4_LIBRARIES})
 
 #----------------------------------------------------------------------------

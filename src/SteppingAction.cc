@@ -18,16 +18,11 @@
 #include "iostream"
 #include "string"
 #include "G4ios.hh"
+#include "Analysis.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//G4double Number=0;
-G4double Energy=0,Energy1=0,Energy2=0;
-G4ThreeVector Direction,Direction1,Direction2;
-G4ThreeVector Position,Position1,Position2;
 
 using std::ofstream;
 using std::string;
-
-extern ofstream outfile1("./data/data1.csv");
 
 //extern ofstream outfile2("./data/data2.txt");
 //extern ofstream outfile11("./data/data3.txt");
@@ -44,6 +39,9 @@ SteppingAction::~SteppingAction()
 
 void SteppingAction::UserSteppingAction(const G4Step* aStep)
 {
+	G4AnalysisManager* man = G4AnalysisManager::Instance();
+
+	extern ofstream outfile1;
 	  G4StepPoint* prePoint = aStep->GetPreStepPoint();
 	  G4StepPoint* postPoint = aStep->GetPostStepPoint();
 	  G4Track* Track = aStep->GetTrack();
@@ -71,25 +69,33 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
 			G4double poy=(postPoint->GetPolarization().getY());
 			G4double poz=(postPoint->GetPolarization().getZ());
 
-			outfile1 << name << " "
-					 << energy << " "
-					 << px << " "
-					 << py << " "
-					 << pz << " "
-					 << dx << " "
-					 << dy << " "
-					 << dz << " "
-					 << ID << " "
-					 << ParentID << " "
-					 << EventID << " "
+			outfile1 << name << ","
+					 << energy << ","
+					 << px << ","
+					 << py << ","
+					 << pz << ","
+					 << dx << ","
+					 << dy << ","
+					 << dz << ","
+					 << ID << ","
+					 << ParentID << ","
+					 << EventID << ","
 //					 << material << " "
-					 << pox << " "
-					<< poy << " "
-					<< poz << " "
-					//      << "proname"
+					 << pox << ","
+					 << poy << ","
+					 << poz << " "
+//                   << "proname"
 					 << G4endl;
+			//           outfile1.close();
 
-	     }
+//		man->FillNtupleDColumn(0,name);
+		man->FillNtupleDColumn(1,px);
+			man->FillNtupleDColumn(1,py);
+			man->FillNtupleDColumn(1,pz);
+//			man->FillNtupleDColumn(1,px);
+
+
+		}
 
 	}
 
